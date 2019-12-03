@@ -1,9 +1,14 @@
+
 var courses       = document.querySelector('#courses-list');
 var cartContent   = document.querySelector('#cart-content tbody');
 var clearCartBtn  = document.querySelector("#clear-cart");
-var coursesList   = [];
+var coursesList   = mobx.observable([]);
 
 setEvents();
+
+mobx.autorun(() => {
+  updateCart();
+});
 
 function setEvents() {
   courses.addEventListener('click', buyCourse);
@@ -21,13 +26,12 @@ function buyCourse(e){
 }
 
 function getCourseInfo(course){
-  const courseInfo = {
-    id    : course.querySelector('a').getAttribute('data-id'),
-    title : course.querySelector('h4').textContent,
-    price : course.querySelector('.price').textContent
-  }
+    const courseInfo = {
+      id    : course.querySelector('a').getAttribute('data-id'),
+      title : course.querySelector('h4').textContent,
+      price : course.querySelector('.price').textContent
+    }
 
-   addToCart(courseInfo);
    coursesList.push(courseInfo);
 }
 
@@ -36,7 +40,7 @@ function addToCart(courseInfo){
   const row = document.createElement('tr');
   row.appendChild(addToCell(courseInfo.title, 0));
   row.appendChild(addToCell(courseInfo.price, 0));
- 
+  
   const anchor = document.createElement('a');
   anchor.href = '#';
   anchor.setAttribute('data-id', courseInfo.id);
@@ -60,33 +64,26 @@ function addToCell(info, i) {
 }
 
 function updateCart() {
-  coursesList.forEach(function(course){
+  cartContent.innerHTML = '';
+  coursesList.forEach(function(course) {
      addToCart(course);
   })
 }
 
 function removeCourse(e) {
-  if (e.target.classList.contains('remove')){
-      let id = e.target.getAttribute('data-id');
-      deleteFromLocalStorage(id);
-      e.target.parentElement.parentElement.remove();
+  if (e.target.classList.contains('remove')) {
+    let id = e.target.getAttribute('data-id');
+
+    var tempList = coursesList.filter(function(item) {
+      return item.id !== id;
+    })
+    coursesList.replace(tempList);
   }
 }
 
-function clearCart(e){
+function clearCart(e) {
   e.preventDefault();
-  while(cartContent.firstChild){
-    cartContent.removeChild(cartContent.firstChild);
-  }
-  coursesList = [];
-}
-
-function deleteFromLocalStorage(id){
-  coursesList.forEach(function(course,i){
-      if (course.id === id){
-        coursesList.splice(i,1)
-      }
-  })
+  coursesList.replace([]);
 }
 
 function buildCourses() {

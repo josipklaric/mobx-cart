@@ -5,8 +5,6 @@ var coursesList   = [];
 
 setEvents();
 
-getFromLocalStorage();
-
 function setEvents() {
   courses.addEventListener('click', buyCourse);
   cartContent.addEventListener('click', removeCourse);
@@ -31,7 +29,6 @@ function getCourseInfo(course){
 
    addToCart(courseInfo);
    coursesList.push(courseInfo);
-   storeToLocalStorage();
 }
 
 function addToCart(courseInfo){
@@ -82,23 +79,6 @@ function clearCart(e){
     cartContent.removeChild(cartContent.firstChild);
   }
   coursesList = [];
-  storeToLocalStorage();
-}
-
-function storeToLocalStorage() {
-  localStorage.setItem("courses", JSON.stringify(coursesList))
-}
-
-function getFromLocalStorage() {
-  const cs = localStorage.getItem('courses');
-
-  if (cs === null){
-    coursesList = [];
-  }
-  else {
-    coursesList = JSON.parse(cs);
-    updateCart();
-  }
 }
 
 function deleteFromLocalStorage(id){
@@ -107,7 +87,6 @@ function deleteFromLocalStorage(id){
         coursesList.splice(i,1)
       }
   })
-  storeToLocalStorage();
 }
 
 function buildCourses() {
